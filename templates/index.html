@@ -1,0 +1,689 @@
+{% raw %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>MarksPredictor – Full Factors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #4c6fff 0, #0f172a 55%, #020617 100%);
+      color: #0f172a;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      padding: 16px;
+    }
+
+    .card {
+      background: #f9fafb;
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1.05fr 1.6fr;
+      gap: 26px;
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-pane {
+      border-radius: 16px;
+      padding: 18px;
+      background: linear-gradient(135deg, #4c6fff, #22c55e);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #facc15;
+    }
+
+    .tagline {
+      margin-top: 18px;
+      font-size: 1.05rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.25);
+      backdrop-filter: blur(10px);
+      margin-top: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+      font-size: 0.8rem;
+    }
+
+    .stat-card {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.2);
+    }
+
+    .stat-label {
+      opacity: 0.8;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer-note {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-top: 14px;
+    }
+
+    .right-pane h2 {
+      margin: 0 0 8px;
+    }
+
+    .subtext {
+      margin: 0 0 16px;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px 16px;
+    }
+
+    @media (max-width: 900px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #374151;
+      margin-bottom: 2px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      outline: none;
+      transition: 0.15s border, 0.15s box-shadow;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #4c6fff;
+      box-shadow: 0 0 0 1px rgba(76, 111, 255, 0.25);
+    }
+
+    .btn {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      padding: 9px 14px;
+      align-items: center;
+      justify-content: center;
+      display: inline-flex;
+      gap: 6px;
+      border-radius: 999px;
+      border: none;
+      background: #4c6fff;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .pill-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      background: #e5e7eb;
+      margin-bottom: 8px;
+    }
+
+    .prediction-box {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      font-size: 0.9rem;
+      color: #14532d;
+    }
+
+    .error {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #b91c1c;
+    }
+
+    .helper {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    /* Charts section */
+    .charts-section {
+      margin-top: 16px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: #eef2ff;
+      border-radius: 12px;
+      padding: 8px;
+      font-size: 0.8rem;
+      color: #111827;
+    }
+
+    .chart-card h4 {
+      margin: 0 0 4px;
+      font-size: 0.85rem;
+    }
+
+    .chart-card img {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="card">
+      <div class="left-pane">
+        <div>
+          <div class="logo">
+            <span class="logo-dot"></span>
+            MarksPredictor
+            <span style="font-weight: 400; font-size: 0.95rem;">full model</span>
+          </div>
+          <p class="tagline">
+            Enter all the study and environment factors. We send them to your
+            scikit-learn model via Flask and estimate your exam score.
+          </p>
+          <div class="pill">
+            <span>🧠</span>
+            <span>Kaggle data • sklearn • Flask • React</span>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">Inputs</div>
+              <div class="stat-value">All 19 factors</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Target</div>
+              <div class="stat-value">Exam_Score</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Model</div>
+              <div class="stat-value">Linear Regression</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Serving</div>
+              <div class="stat-value">Flask /api/predict</div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-note">
+          Numeric fields from your CSV: Hours_Studied, Attendance, Sleep_Hours,
+          Previous_Scores, Tutoring_Sessions, Physical_Activity.
+          All others are categorical (Low/Medium/High, Yes/No, etc.).
+        </div>
+      </div>
+
+      <div class="right-pane">
+        <h2>Predict your exam score</h2>
+        <p class="subtext">
+          Fill in each field using the same format as the Kaggle dataset
+          (numbers where the CSV has numbers, and the exact category names).
+        </p>
+        <div id="root"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- React + ReactDOM + Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [form, setForm] = useState({
+        Hours_Studied: "",
+        Attendance: "",
+        Parental_Involvement: "Medium",
+        Access_to_Resources: "Medium",
+        Extracurricular_Activities: "Yes",
+        Sleep_Hours: "",
+        Previous_Scores: "",
+        Motivation_Level: "Medium",
+        Internet_Access: "Yes",
+        Tutoring_Sessions: "",
+        Family_Income: "Medium",
+        Teacher_Quality: "Medium",
+        School_Type: "Public",
+        Peer_Influence: "Neutral",
+        Physical_Activity: "",
+        Learning_Disabilities: "No",
+        Parental_Education_Level: "College",
+        Distance_from_Home: "Near",
+        Gender: "Male",
+      });
+
+      const [prediction, setPrediction] = useState("");
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      const updateField = (name, value) => {
+        setForm((prev) => ({ ...prev, [name]: value }));
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setPrediction("");
+        setError("");
+        setLoading(true);
+
+        try {
+          // numeric fields in CSV
+          const numericFields = [
+            "Hours_Studied",
+            "Attendance",
+            "Sleep_Hours",
+            "Previous_Scores",
+            "Tutoring_Sessions",
+            "Physical_Activity",
+          ];
+          for (const f of numericFields) {
+            if (form[f] === "" || isNaN(parseFloat(form[f]))) {
+              throw new Error(`Please enter a valid number for ${f}`);
+            }
+          }
+
+          const res = await fetch("/api/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || "Something went wrong");
+          }
+
+          setPrediction(`Predicted Exam Score: ${data.prediction.toFixed(2)} / 100`);
+        } catch (err) {
+          setError(err.message || "Failed to get prediction");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <>
+          <div className="pill-inline">
+            <span>📡</span>
+            <span>Sending all features to your Flask model</span>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            {/* NUMERIC FIELDS */}
+            <div className="field">
+              <label>Hours_Studied</label>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                value={form.Hours_Studied}
+                onChange={(e) => updateField("Hours_Studied", e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label>Attendance (numeric, e.g. 84)</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value={form.Attendance}
+                onChange={(e) => updateField("Attendance", e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label>Sleep_Hours</label>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                value={form.Sleep_Hours}
+                onChange={(e) => updateField("Sleep_Hours", e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label>Previous_Scores (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                value={form.Previous_Scores}
+                onChange={(e) => updateField("Previous_Scores", e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label>Tutoring_Sessions (numeric, e.g. 0–5)</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={form.Tutoring_Sessions}
+                onChange={(e) => updateField("Tutoring_Sessions", e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label>Physical_Activity (numeric, e.g. 3)</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={form.Physical_Activity}
+                onChange={(e) => updateField("Physical_Activity", e.target.value)}
+                required
+              />
+            </div>
+
+            {/* CATEGORICAL FIELDS */}
+            <div className="field">
+              <label>Parental_Involvement</label>
+              <select
+                value={form.Parental_Involvement}
+                onChange={(e) => updateField("Parental_Involvement", e.target.value)}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Access_to_Resources</label>
+              <select
+                value={form.Access_to_Resources}
+                onChange={(e) => updateField("Access_to_Resources", e.target.value)}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Extracurricular_Activities</label>
+              <select
+                value={form.Extracurricular_Activities}
+                onChange={(e) =>
+                  updateField("Extracurricular_Activities", e.target.value)
+                }
+              >
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Motivation_Level</label>
+              <select
+                value={form.Motivation_Level}
+                onChange={(e) => updateField("Motivation_Level", e.target.value)}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Internet_Access</label>
+              <select
+                value={form.Internet_Access}
+                onChange={(e) => updateField("Internet_Access", e.target.value)}
+              >
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Family_Income</label>
+              <select
+                value={form.Family_Income}
+                onChange={(e) => updateField("Family_Income", e.target.value)}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Teacher_Quality</label>
+              <select
+                value={form.Teacher_Quality}
+                onChange={(e) => updateField("Teacher_Quality", e.target.value)}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>School_Type</label>
+              <select
+                value={form.School_Type}
+                onChange={(e) => updateField("School_Type", e.target.value)}
+              >
+                <option>Public</option>
+                <option>Private</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Peer_Influence</label>
+              <select
+                value={form.Peer_Influence}
+                onChange={(e) => updateField("Peer_Influence", e.target.value)}
+              >
+                <option>Positive</option>
+                <option>Neutral</option>
+                <option>Negative</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Learning_Disabilities</label>
+              <select
+                value={form.Learning_Disabilities}
+                onChange={(e) =>
+                  updateField("Learning_Disabilities", e.target.value)
+                }
+              >
+                <option>No</option>
+                <option>Yes</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Parental_Education_Level</label>
+              <select
+                value={form.Parental_Education_Level}
+                onChange={(e) =>
+                  updateField("Parental_Education_Level", e.target.value)
+                }
+              >
+                <option>High School</option>
+                <option>College</option>
+                <option>Postgraduate</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Distance_from_Home</label>
+              <select
+                value={form.Distance_from_Home}
+                onChange={(e) => updateField("Distance_from_Home", e.target.value)}
+              >
+                <option>Near</option>
+                <option>Moderate</option>
+                <option>Far</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Gender</label>
+              <select
+                value={form.Gender}
+                onChange={(e) => updateField("Gender", e.target.value)}
+              >
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+
+            <button type="submit" className="btn" disabled={loading}>
+              {loading ? "Predicting..." : "Predict marks"}
+            </button>
+          </form>
+
+          {prediction && (
+            <div className="prediction-box">
+              {prediction}
+              <div className="helper">
+                This comes directly from your trained sklearn model (via Flask).
+              </div>
+            </div>
+          )}
+
+          {error && <div className="error">{error}</div>}
+
+          {/* Charts Section */}
+          <div className="charts-section">
+            <div className="pill-inline" style={{ marginBottom: 6 }}>
+              <span>📊</span>
+              <span>Dataset insights from your training data</span>
+            </div>
+
+            <div className="charts-grid">
+              <div className="chart-card">
+                <h4>Exam Score Distribution</h4>
+                <img src="/charts/exam_score_hist.png" alt="Exam score histogram" />
+              </div>
+
+              <div className="chart-card">
+                <h4>Hours Studied Distribution</h4>
+                <img src="/charts/hours_studied_hist.png" alt="Hours studied histogram" />
+              </div>
+
+              <div className="chart-card">
+                <h4>Actual vs Predicted Exam Score</h4>
+                <img src="/charts/actual_vs_predicted.png" alt="Actual vs predicted scatter" />
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+
+</html>
+{% endraw %}
